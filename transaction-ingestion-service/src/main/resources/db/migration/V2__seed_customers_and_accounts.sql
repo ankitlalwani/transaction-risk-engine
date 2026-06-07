@@ -1,0 +1,136 @@
+--inserting customers
+INSERT INTO customers (
+    id,
+    external_customer_id,
+    full_name,
+    email,
+    phone_number,
+    status
+)
+VALUES
+    (
+        '11111111-1111-1111-1111-111111111111',
+        'CUST-1001',
+        'Aarav Mehta',
+        'aarav.mehta@example.com',
+        '+1-704-555-1001',
+        'ACTIVE'
+    ),
+    (
+        '22222222-2222-2222-2222-222222222222',
+        'CUST-1002',
+        'Sophia Johnson',
+        'sophia.johnson@example.com',
+        '+1-704-555-1002',
+        'ACTIVE'
+    ),
+    (
+        '33333333-3333-3333-3333-333333333333',
+        'CUST-1003',
+        'Daniel Carter',
+        'daniel.carter@example.com',
+        '+1-704-555-1003',
+        'ACTIVE'
+    ),
+    (
+        '44444444-4444-4444-4444-444444444444',
+        'CUST-1004',
+        'Priya Sharma',
+        'priya.sharma@example.com',
+        '+1-704-555-1004',
+        'ACTIVE'
+    ),
+    (
+        '55555555-5555-5555-5555-555555555555',
+        'CUST-1005',
+        'Michael Brown',
+        'michael.brown@example.com',
+        '+1-704-555-1005',
+        'BLOCKED'
+    )
+    ON CONFLICT (external_customer_id) DO NOTHING;
+
+--inserting dummy accounts
+INSERT INTO accounts (
+    id,
+    customer_id,
+    external_account_id,
+    account_type,
+    account_status,
+    currency,
+    current_balance
+)
+VALUES
+    (
+        'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1',
+        '11111111-1111-1111-1111-111111111111',
+        'ACC-9001',
+        'CHECKING',
+        'ACTIVE',
+        'USD',
+        12500.00
+    ),
+    (
+        'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2',
+        '11111111-1111-1111-1111-111111111111',
+        'ACC-9002',
+        'SAVINGS',
+        'ACTIVE',
+        'USD',
+        42500.00
+    ),
+    (
+        'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1',
+        '22222222-2222-2222-2222-222222222222',
+        'ACC-9003',
+        'CHECKING',
+        'ACTIVE',
+        'USD',
+        8500.75
+    ),
+    (
+        'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb2',
+        '22222222-2222-2222-2222-222222222222',
+        'ACC-9004',
+        'CREDIT_CARD',
+        'ACTIVE',
+        'USD',
+        1500.25
+    ),
+    (
+        'cccccccc-cccc-cccc-cccc-ccccccccccc1',
+        '33333333-3333-3333-3333-333333333333',
+        'ACC-9005',
+        'CHECKING',
+        'ACTIVE',
+        'USD',
+        23000.00
+    ),
+    (
+        'dddddddd-dddd-dddd-dddd-ddddddddddd1',
+        '44444444-4444-4444-4444-444444444444',
+        'ACC-9006',
+        'CHECKING',
+        'ACTIVE',
+        'USD',
+        6750.50
+    ),
+    (
+        'dddddddd-dddd-dddd-dddd-ddddddddddd2',
+        '44444444-4444-4444-4444-444444444444',
+        'ACC-9007',
+        'SAVINGS',
+        'FROZEN',
+        'USD',
+        32500.00
+    ),
+    (
+        'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+        '55555555-5555-5555-5555-555555555555',
+        'ACC-9008',
+        'CHECKING',
+        'ACTIVE',
+        'USD',
+        9900.00
+    )
+    ON CONFLICT (external_account_id) DO NOTHING;

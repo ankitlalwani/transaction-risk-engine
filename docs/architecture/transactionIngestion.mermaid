@@ -1,0 +1,21 @@
+flowchart LR
+    Client[Client / Postman / Future UI] --> API[Transaction REST API]
+
+    API --> Auth[Basic Auth Layer / Future JWT]
+    Auth --> Service[Transaction Service]
+
+    Service --> Validator[Transaction Validator]
+    Service --> DB[(PostgreSQL)]
+    Service --> Outbox[Transaction Outbox Table]
+
+    Outbox --> Publisher[Outbox Publisher / Kafka Producer]
+    Publisher --> Kafka[(Kafka Topic: transaction.created.v1)]
+
+    Kafka --> Consumer[Transaction Event Consumer]
+    Consumer --> Audit[Event Audit / Logging]
+    Consumer --> DB
+
+    Service --> Redis[(Redis Cache - Optional Week 1)]
+
+    DB --> QueryAPI[Transaction Query API]
+    QueryAPI --> Client

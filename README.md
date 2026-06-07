@@ -1,15 +1,14 @@
-# RiskPulse AI
+# Transaction Risk Engine
 
-RiskPulse AI is a portfolio-grade financial risk monitoring platform built using Java, Spring Boot, Kafka, PostgreSQL, and AI-assisted risk explanation capabilities.
+An event-driven financial transaction risk monitoring platform built with Spring Boot, Kafka, PostgreSQL, and AI-assisted risk explanations.
 
 The project is being developed incrementally as a multi-service platform.
 
 ## Current Services
 
 ```text
-riskpulse-ai/
-  services/
-    transaction-ingestion-service/
+transaction-risk-engine/
+  transaction-ingestion-service/
 ```
 ### Transaction Ingestion Service
 The transaction-ingestion-service is now able to receive transaction requests through a REST API, validate customer/account information, persist transaction records, save outbox events, publish messages to Kafka, and audit consumed Kafka events.
@@ -50,7 +49,7 @@ transaction_event_audit
 Flow
 
 ```angular2html
-1. Client submits transaction using POST /api/v1/transactions
+1. Client submits transaction using POST /api/transactions
 2. Service validates customer and account
 3. Service checks idempotency key
 4. Transaction is saved in transactions table
@@ -76,7 +75,7 @@ Postman
 
 From the root folder:
 ```text
-cd riskpulse-ai
+cd transaction-risk-engine
 docker compose up -d
 ```
 This should start:
@@ -93,14 +92,14 @@ Verify containers are running:
 Expected containers:
 
 ```
-riskpulse-postgres
-riskpulse-kafka
+transaction-risk-engine-postgres
+transaction-risk-engine-kafka
 ```
 2. Verify PostgreSQL
 
 Connect to PostgreSQL:
 
-```docker exec -it riskpulse-postgres psql -U riskpulse_user -d riskpulse```
+```docker exec -it transaction-risk-engine-postgres psql -U transaction_risk_user -d transaction_risk_engine```
 
 List tables:
 
@@ -125,7 +124,7 @@ Exit PostgreSQL:
 Navigate to the service folder:
 
 ```
-cd services/transaction-ingestion-service
+cd transaction-ingestion-service
 ```
 Run the Spring Boot application:
 
@@ -142,7 +141,7 @@ The transaction events are published to:
 To list Kafka topics:
 
 ```
-docker exec -it riskpulse-kafka kafka-topics.sh \
+docker exec -it transaction-risk-engine-kafka kafka-topics.sh \
 --bootstrap-server localhost:9092 \
 --list
 ```

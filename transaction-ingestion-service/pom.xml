@@ -8,11 +8,11 @@
 		<version>4.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.riskpulse-ai</groupId>
+	<groupId>com.transactionriskengine</groupId>
 	<artifactId>transaction-ingestion-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>Transaction Ingestion Service</name>
+	<description>Transaction ingestion service for the Transaction Risk Engine platform</description>
 	<url/>
 	<licenses>
 		<license/>

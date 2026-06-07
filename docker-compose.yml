@@ -1,20 +1,22 @@
+name: transaction-risk-engine
+
 services:
   postgres:
     image: postgres:16
-    container_name: riskpulse-postgres
+    container_name: transaction-risk-engine-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: riskpulse
-      POSTGRES_USER: riskpulse_user
-      POSTGRES_PASSWORD: riskpulse_pass
+      POSTGRES_DB: transaction_risk_engine
+      POSTGRES_USER: transaction_risk_user
+      POSTGRES_PASSWORD: transaction_risk_pass
     ports:
       - "5432:5432"
     volumes:
-      - riskpulse_postgres_data:/var/lib/postgresql/data
+      - transaction_risk_engine_postgres_data:/var/lib/postgresql/data
 
   kafka:
     image: apache/kafka:3.7.0
-    container_name: riskpulse-kafka
+    container_name: transaction-risk-engine-kafka
     hostname: kafka
     restart: unless-stopped
     ports:
@@ -36,4 +38,4 @@ services:
       CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
 
 volumes:
-  riskpulse_postgres_data:
+  transaction_risk_engine_postgres_data:

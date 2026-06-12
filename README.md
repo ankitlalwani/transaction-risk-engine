@@ -8,7 +8,10 @@ The project is being developed incrementally as a multi-service platform.
 
 ```text
 transaction-risk-engine/
-  transaction-ingestion-service/
+  services/
+    transaction-ingestion-service/
+    risk-engine-service/
+    alert-service/
 ```
 ### Transaction Ingestion Service
 The transaction-ingestion-service is now able to receive transaction requests through a REST API, validate customer/account information, persist transaction records, save outbox events, publish messages to Kafka, and audit consumed Kafka events.
@@ -124,7 +127,7 @@ Exit PostgreSQL:
 Navigate to the service folder:
 
 ```
-cd transaction-ingestion-service
+cd services/transaction-ingestion-service
 ```
 Run the Spring Boot application:
 

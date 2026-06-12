@@ -1,0 +1,35 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: alert-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/transaction_risk_engine
+    username: transaction_risk_user
+    password: transaction_risk_pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    table: flyway_alert_service_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: alert-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+transaction-risk-engine:
+  kafka:
+    topics:
+      risk-evaluated: risk.evaluated.v1

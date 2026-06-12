@@ -1,0 +1,40 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: risk-engine-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/transaction_risk_engine
+    username: transaction_risk_user
+    password: transaction_risk_pass
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    table: flyway_risk_engine_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: risk-engine-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+transaction-risk-engine:
+  kafka:
+    topics:
+      transaction-created: transaction.created.v1
+      risk-evaluated: risk.evaluated.v1
+  outbox:
+    publisher:
+      enabled: true
+      fixed-delay-ms: 5000

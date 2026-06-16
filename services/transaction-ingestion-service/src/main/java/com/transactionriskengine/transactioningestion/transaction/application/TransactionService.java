@@ -8,6 +8,7 @@ import com.transactionriskengine.transactioningestion.customer.repository.Custom
 import com.transactionriskengine.transactioningestion.messaging.event.TransactionEventPayload;
 import com.transactionriskengine.transactioningestion.messaging.outbox.OutboxEvent;
 import com.transactionriskengine.transactioningestion.messaging.outbox.OutboxEventRepository;
+import com.transactionriskengine.transactioningestion.transaction.api.LatestTransactionResponse;
 import com.transactionriskengine.transactioningestion.transaction.api.TransactionRequest;
 import com.transactionriskengine.transactioningestion.transaction.api.TransactionResponse;
 import com.transactionriskengine.transactioningestion.transaction.domain.Transaction;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
+import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -55,6 +57,17 @@ public class TransactionService {
         return transactionRepository.findByIdempotencyKey(request.idempotencyKey())
                 .map(this::toIdempotentResponse)
                 .orElseGet(() -> createNewTransaction(request));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<LatestTransactionResponse> getLatestTransaction() {
+        return transactionRepository.findFirstByOrderByCreatedAtDesc()
+                .map(transaction -> new LatestTransactionResponse(
+                        transaction.getId(),
+                        transaction.getTransactionReference(),
+                        transaction.getTransactionStatus().name(),
+                        transaction.getCreatedAt()
+                ));
     }
 
     private TransactionResponse createNewTransaction(TransactionRequest request) {

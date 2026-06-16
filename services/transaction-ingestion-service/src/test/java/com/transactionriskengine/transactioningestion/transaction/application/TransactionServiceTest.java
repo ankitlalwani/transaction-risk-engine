@@ -9,6 +9,7 @@ import com.transactionriskengine.transactioningestion.customer.domain.CustomerSt
 import com.transactionriskengine.transactioningestion.customer.repository.CustomerRepository;
 import com.transactionriskengine.transactioningestion.messaging.outbox.OutboxEvent;
 import com.transactionriskengine.transactioningestion.messaging.outbox.OutboxEventRepository;
+import com.transactionriskengine.transactioningestion.transaction.api.LatestTransactionResponse;
 import com.transactionriskengine.transactioningestion.transaction.api.TransactionRequest;
 import com.transactionriskengine.transactioningestion.transaction.api.TransactionResponse;
 import com.transactionriskengine.transactioningestion.transaction.domain.PaymentChannel;
@@ -233,6 +234,30 @@ class TransactionServiceTest {
 
         verify(transactionRepository, never()).save(any(Transaction.class));
         verify(outboxEventRepository, never()).save(any(OutboxEvent.class));
+    }
+
+    @Test
+    void getLatestTransactionReturnsLatestRepositoryRecord() {
+        Transaction transaction = mock(Transaction.class);
+        UUID transactionId = UUID.randomUUID();
+        Instant createdAt = Instant.parse("2026-06-15T12:00:00Z");
+
+        when(transaction.getId()).thenReturn(transactionId);
+        when(transaction.getTransactionReference()).thenReturn("TXN-" + transactionId);
+        when(transaction.getTransactionStatus()).thenReturn(TransactionStatus.RECEIVED);
+        when(transaction.getCreatedAt()).thenReturn(createdAt);
+        when(transactionRepository.findFirstByOrderByCreatedAtDesc())
+                .thenReturn(Optional.of(transaction));
+
+        Optional<LatestTransactionResponse> response =
+                transactionService.getLatestTransaction();
+
+        assertThat(response).contains(new LatestTransactionResponse(
+                transactionId,
+                "TXN-" + transactionId,
+                "RECEIVED",
+                createdAt
+        ));
     }
 
     private void assertTransactionCreated(TransactionRequest request, UUID customerId, UUID accountId) {

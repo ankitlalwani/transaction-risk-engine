@@ -166,4 +166,8 @@ public class Transaction {
     public Instant getTransactionTime() {
         return transactionTime;
     }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 }

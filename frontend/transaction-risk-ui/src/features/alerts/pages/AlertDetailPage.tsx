@@ -1,14 +1,34 @@
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Badge } from "../../../components/ui/Badge";
+import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
-import { getAlertById } from "../api/alertApi";
+import { getAlertById, updateAlertStatus } from "../api/alertApi";
 import type {
   AlertPriority,
   AlertStatus,
   AlertTriggeredRule,
+  Alert,
 } from "../types";
+
+const alertStatuses: AlertStatus[] = [
+  "OPEN",
+  "IN_REVIEW",
+  "ESCALATED",
+  "CLOSED",
+  "FALSE_POSITIVE",
+];
+
+const assignees = [
+  "analyst-1",
+  "analyst-2",
+  "analyst-3",
+  "analyst-4",
+  "analyst-5",
+];
 
 function priorityVariant(priority: AlertPriority) {
   if (priority === "CRITICAL") return "danger";
@@ -35,6 +55,7 @@ function parseTriggeredRules(value: string): AlertTriggeredRule[] {
 
 export function AlertDetailPage() {
   const { alertId } = useParams();
+  const queryClient = useQueryClient();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["alert", alertId],
     queryFn: () => getAlertById(alertId!),
@@ -102,6 +123,18 @@ export function AlertDetailPage() {
           </div>
         </dl>
       </Card>
+
+      <div className="detail-section">
+        <Card title="Update Alert">
+          <AlertUpdateForm
+            alert={data}
+            onUpdated={(updatedAlert) => {
+              queryClient.setQueryData(["alert", alertId], updatedAlert);
+              queryClient.invalidateQueries({ queryKey: ["alerts"] });
+            }}
+          />
+        </Card>
+      </div>
 
       <div className="detail-section">
         <Card title="Related Transaction">
@@ -182,5 +215,82 @@ export function AlertDetailPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+type AlertUpdateFormProps = {
+  alert: Alert;
+  onUpdated: (alert: Alert) => void;
+};
+
+function AlertUpdateForm({ alert, onUpdated }: AlertUpdateFormProps) {
+  const [selectedStatus, setSelectedStatus] = useState<AlertStatus>(
+    alert.alertStatus
+  );
+  const [selectedAssignee, setSelectedAssignee] = useState(
+    alert.assignedTo ?? "analyst-1"
+  );
+  const updateMutation = useMutation({
+    mutationFn: () =>
+      updateAlertStatus(alert.id, {
+        status: selectedStatus,
+        assignedTo: selectedAssignee,
+      }),
+    onSuccess: onUpdated,
+  });
+
+  function handleUpdateAlert(event: FormEvent) {
+    event.preventDefault();
+    updateMutation.mutate();
+  }
+
+  return (
+    <>
+      <form className="alert-update-form" onSubmit={handleUpdateAlert}>
+        <label>
+          Alert Status
+          <select
+            value={selectedStatus}
+            onChange={(event) =>
+              setSelectedStatus(event.target.value as AlertStatus)
+            }
+          >
+            {alertStatuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          Assigned To
+          <select
+            value={selectedAssignee}
+            onChange={(event) => setSelectedAssignee(event.target.value)}
+          >
+            {assignees.map((assignee) => (
+              <option key={assignee} value={assignee}>
+                {assignee}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div className="form-actions">
+          <Button type="submit" disabled={updateMutation.isPending}>
+            {updateMutation.isPending ? "Updating..." : "Update Alert"}
+          </Button>
+        </div>
+      </form>
+
+      {updateMutation.isSuccess && (
+        <div className="success-box">Alert updated successfully.</div>
+      )}
+
+      {updateMutation.isError && (
+        <div className="error-box">Failed to update alert.</div>
+      )}
+    </>
   );
 }

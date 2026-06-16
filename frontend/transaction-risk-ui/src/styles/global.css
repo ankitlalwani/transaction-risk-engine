@@ -226,6 +226,20 @@ a:hover {
   gap: 16px;
 }
 
+.alert-update-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.alert-update-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: #374151;
+}
+
 .demo-scenarios {
   padding: 18px;
   margin-bottom: 22px;
@@ -517,6 +531,7 @@ select {
   }
 
   .demo-scenario-grid,
+  .alert-update-form,
   .form-grid {
     grid-template-columns: 1fr;
   }

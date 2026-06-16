@@ -28,7 +28,7 @@ export async function updateAlertStatus(
   request: UpdateAlertStatusRequest
 ): Promise<Alert> {
   const response = await alertClient.patch<Alert>(
-    `/api/v1/alerts/${alertId}/status`,
+    `/api/v1/alerts/${alertId}`,
     request
   );
 

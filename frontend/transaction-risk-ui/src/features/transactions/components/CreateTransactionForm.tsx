@@ -12,6 +12,8 @@ import type { CreateTransactionRequest } from "../types";
 
 type DemoScenario = {
   label: string;
+  description: string;
+  tone: "low" | "medium" | "critical" | "missing";
   payload: Omit<
     CreateTransactionRequest,
     "idempotencyKey" | "transactionTime"
@@ -21,6 +23,8 @@ type DemoScenario = {
 const demoScenarios: DemoScenario[] = [
   {
     label: "Create Low Risk Card Purchase",
+    description: "Small card purchase with device and IP present.",
+    tone: "low",
     payload: {
       externalCustomerId: "CUST-1002",
       externalAccountId: "ACC-9003",
@@ -37,6 +41,8 @@ const demoScenarios: DemoScenario[] = [
   },
   {
     label: "Create Medium Risk Mobile Transfer",
+    description: "Larger mobile transfer requiring closer monitoring.",
+    tone: "medium",
     payload: {
       externalCustomerId: "CUST-1001",
       externalAccountId: "ACC-9001",
@@ -53,6 +59,8 @@ const demoScenarios: DemoScenario[] = [
   },
   {
     label: "Create Critical Wire Transfer",
+    description: "High-value wire transfer to a foreign merchant country.",
+    tone: "critical",
     payload: {
       externalCustomerId: "CUST-1001",
       externalAccountId: "ACC-9001",
@@ -69,6 +77,8 @@ const demoScenarios: DemoScenario[] = [
   },
   {
     label: "Create Missing Device/IP Transaction",
+    description: "Card purchase with missing device and network context.",
+    tone: "missing",
     payload: {
       externalCustomerId: "CUST-1002",
       externalAccountId: "ACC-9003",
@@ -149,7 +159,15 @@ export function CreateTransactionForm() {
   }
 
   return (
-    <Card title="New Transaction">
+    <Card title="New Transaction" variant="slate">
+      <div className="transaction-flow-hint">
+        <span>Transaction Submitted</span>
+        <strong>→</strong>
+        <span>Risk Evaluated</span>
+        <strong>→</strong>
+        <span>Alert Decision</span>
+      </div>
+
       <section className="demo-scenarios">
         <div>
           <h3>Create Demo Transaction</h3>
@@ -165,12 +183,16 @@ export function CreateTransactionForm() {
               key={scenario.label}
               type="button"
               variant="secondary"
+              className={`demo-scenario-button demo-scenario-${scenario.tone}`}
               disabled={mutation.isPending}
               onClick={() => createDemoTransaction(scenario)}
             >
-              {activeScenario === scenario.label && mutation.isPending
-                ? "Creating..."
-                : scenario.label}
+              <strong>
+                {activeScenario === scenario.label && mutation.isPending
+                  ? "Creating..."
+                  : scenario.label}
+              </strong>
+              <span>{scenario.description}</span>
             </Button>
           ))}
         </div>
@@ -180,7 +202,7 @@ export function CreateTransactionForm() {
         <span>Or enter transaction details manually</span>
       </div>
 
-      <form className="form-grid" onSubmit={handleSubmit}>
+      <form className="form-grid transaction-form-grid" onSubmit={handleSubmit}>
         <label>
           Idempotency Key
           <input

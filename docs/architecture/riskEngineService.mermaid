@@ -1,0 +1,31 @@
+flowchart LR
+    TransactionKafka[(Kafka Topic: transaction.created.v1)] --> Consumer[Transaction Created Event Consumer]
+
+    Consumer --> EvaluationService[Risk Evaluation Service]
+
+    EvaluationService --> RuleEvaluator[Risk Rule Evaluator]
+    RuleEvaluator --> RuleRepository[Risk Rule Repository]
+    RuleRepository --> RiskRules[(Risk Rules Table)]
+
+    RuleEvaluator --> AmountRules[Amount Rules]
+    RuleEvaluator --> ChannelRules[Payment Channel Rules]
+    RuleEvaluator --> LocationRules[Location Rules]
+    RuleEvaluator --> MerchantRules[Merchant Category Rules]
+    RuleEvaluator --> DeviceRules[Device / IP Rules]
+    RuleEvaluator --> CompositeRules[Composite Rules]
+
+    EvaluationService --> ScoreCalculator[Risk Score Calculator]
+    EvaluationService --> ReasonBuilder[Decision Reason Builder]
+    EvaluationService --> DecisionRepository[Risk Decision Repository]
+
+    DecisionRepository --> RiskDecisionDB[(Risk Decisions Table)]
+    EvaluationService --> RiskOutbox[Risk Outbox Table]
+
+    RiskOutbox --> Publisher[Outbox Publisher / Kafka Producer]
+    Publisher --> RiskKafka[(Kafka Topic: risk.evaluated.v1)]
+
+    RiskKafka --> AlertService[Alert Service]
+
+    Client[Client / Future UI] --> QueryAPI[Risk Decision REST API]
+    QueryAPI --> QueryService[Risk Decision Query Service]
+    QueryService --> RiskDecisionDB

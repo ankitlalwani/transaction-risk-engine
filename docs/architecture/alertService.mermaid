@@ -1,0 +1,21 @@
+flowchart LR
+    RiskKafka[(Kafka Topic: risk.evaluated.v1)] --> Consumer[Risk Evaluated Event Consumer]
+
+    Consumer --> AlertCreationService[Alert Creation Service]
+    AlertCreationService --> PriorityMapper[Alert Priority Mapper]
+    AlertCreationService --> AlertRepository[Alert Repository]
+
+    AlertRepository --> AlertsDB[(Alerts Table)]
+
+    Client[Client / Future UI] --> AlertAPI[Alert REST API]
+    AlertAPI --> QueryService[Alert Query Service]
+    QueryService --> AlertsDB
+
+    AlertAPI --> StatusUpdateService[Alert Status Update Service]
+    StatusUpdateService --> AlertRepository
+
+    StatusUpdateService --> Assignment[Assigned Analyst]
+    StatusUpdateService --> Status[Alert Status]
+
+    AlertsDB --> Filters[Status / Priority / Risk Filters]
+    Filters --> AlertAPI

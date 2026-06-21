@@ -1,0 +1,20 @@
+export type AiExplanation = {
+  id: string;
+  riskDecisionId?: string | null;
+  transactionId: string;
+  transactionReference: string;
+  customerId: string;
+  accountId: string;
+  riskScore: number;
+  riskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  decisionStatus: string;
+  explanationStatus: "GENERATED" | "FAILED" | "SKIPPED";
+  explanationText: string;
+  recommendedAction: string;
+  analystSummary: string;
+  modelProvider?: string | null;
+  modelName?: string | null;
+  promptVersion?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};

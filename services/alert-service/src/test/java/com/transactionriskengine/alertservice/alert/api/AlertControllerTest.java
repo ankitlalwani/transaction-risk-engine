@@ -64,6 +64,33 @@ class AlertControllerTest {
     }
 
     @Test
+    void updateAlertReturnsUpdatedAlert() throws Exception {
+        UUID alertId = UUID.randomUUID();
+        AlertResponse response = mock(AlertResponse.class);
+        when(response.id()).thenReturn(alertId);
+        when(response.alertStatus()).thenReturn(AlertStatus.ESCALATED);
+        when(response.assignedTo()).thenReturn("analyst-2");
+        when(alertStatusUpdateService.updateStatus(
+                alertId,
+                AlertStatus.ESCALATED,
+                "analyst-2"
+        )).thenReturn(response);
+
+        mockMvc.perform(patch("/api/v1/alerts/{alertId}", alertId)
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "status": "ESCALATED",
+                                  "assignedTo": "analyst-2"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(alertId.toString()))
+                .andExpect(jsonPath("$.alertStatus").value("ESCALATED"))
+                .andExpect(jsonPath("$.assignedTo").value("analyst-2"));
+    }
+
+    @Test
     void updateAlertStatusRejectsMissingAssignee() throws Exception {
         mockMvc.perform(patch("/api/v1/alerts/{alertId}/status", UUID.randomUUID())
                         .contentType("application/json")

@@ -9,3 +9,4 @@
 *.log
 .env
 .env.*
+!frontend/transaction-risk-ui/.env.example

@@ -1,4 +1,4 @@
-package com.transactionriskengine.alertservice.messaging.event;
+package com.transactionriskengine.aiexplanation.messaging.event;
 
 public record TriggeredRule(
         String ruleCode,

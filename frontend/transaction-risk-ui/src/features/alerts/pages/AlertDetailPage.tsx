@@ -6,6 +6,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "../../../components/ui/Badge";
 import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
+import {
+  getAiExplanationByTransactionId,
+  getAiExplanationErrorMessage,
+} from "../../ai-explanations/api/aiExplanationApi";
+import type { AiExplanation } from "../../ai-explanations/types";
 import { getAlertById, updateAlertStatus } from "../api/alertApi";
 import type {
   AlertPriority,
@@ -60,6 +65,11 @@ export function AlertDetailPage() {
     queryKey: ["alert", alertId],
     queryFn: () => getAlertById(alertId!),
     enabled: Boolean(alertId),
+  });
+  const aiExplanationQuery = useQuery({
+    queryKey: ["ai-explanation", data?.transactionId],
+    queryFn: () => getAiExplanationByTransactionId(data!.transactionId),
+    enabled: Boolean(data?.transactionId),
   });
 
   if (!alertId) return <p>Alert ID is missing.</p>;
@@ -164,6 +174,19 @@ export function AlertDetailPage() {
       </div>
 
       <div className="detail-section">
+        <AiExplanationCard
+          explanation={aiExplanationQuery.data}
+          isLoading={aiExplanationQuery.isLoading}
+          isError={aiExplanationQuery.isError}
+          errorMessage={
+            aiExplanationQuery.error
+              ? getAiExplanationErrorMessage(aiExplanationQuery.error)
+              : undefined
+          }
+        />
+      </div>
+
+      <div className="detail-section">
         <Card title="Alert Timeline">
           <dl className="detail-grid">
             <div>
@@ -215,6 +238,65 @@ export function AlertDetailPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+type AiExplanationCardProps = {
+  explanation?: AiExplanation | null;
+  isLoading: boolean;
+  isError: boolean;
+  errorMessage?: string;
+};
+
+function AiExplanationCard({
+  explanation,
+  isLoading,
+  isError,
+  errorMessage,
+}: AiExplanationCardProps) {
+  if (isLoading) {
+    return (
+      <Card title="AI Explanation">
+        <p>Loading AI explanation...</p>
+      </Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card title="AI Explanation">
+        <div className="error-box">
+          {errorMessage ?? "Failed to load AI explanation."}
+        </div>
+      </Card>
+    );
+  }
+
+  if (!explanation) {
+    return (
+      <Card title="AI Explanation">
+        <p>No AI explanation is available for this transaction yet.</p>
+      </Card>
+    );
+  }
+
+  return (
+    <Card title="AI Explanation">
+      <dl className="detail-grid">
+        <div className="detail-grid-wide">
+          <dt>Analyst Summary</dt>
+          <dd>{explanation.analystSummary}</dd>
+        </div>
+        <div className="detail-grid-wide">
+          <dt>Explanation</dt>
+          <dd>{explanation.explanationText}</dd>
+        </div>
+        <div className="detail-grid-wide">
+          <dt>Recommended Action</dt>
+          <dd>{explanation.recommendedAction}</dd>
+        </div>
+      </dl>
+    </Card>
   );
 }
 

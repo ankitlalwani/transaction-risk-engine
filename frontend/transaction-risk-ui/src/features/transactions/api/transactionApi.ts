@@ -31,7 +31,7 @@ export async function createTransaction(
   request: CreateTransactionRequest
 ): Promise<CreateTransactionResponse> {
   const response = await transactionClient.post<CreateTransactionResponse>(
-    "/api/transactions",
+    "/api/v1/transactions",
     request
   );
 
@@ -41,7 +41,7 @@ export async function createTransaction(
 export async function getLatestTransaction(): Promise<LatestTransaction | null> {
   try {
     const response = await transactionClient.get<LatestTransaction>(
-      "/api/transactions/latest"
+      "/api/v1/transactions/latest"
     );
     return response.data || null;
   } catch (error) {

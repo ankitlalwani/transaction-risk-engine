@@ -1,0 +1,51 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: ai-explanation-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/transaction_risk_engine
+    username: transaction_risk_user
+    password: transaction_risk_pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    table: flyway_ai_explanation_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      group-id: ai-explanation-service
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    listener:
+      ack-mode: record
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+ai-explanation-service:
+  kafka:
+    topics:
+      risk-evaluated: risk.evaluated.v1

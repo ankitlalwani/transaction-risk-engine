@@ -72,6 +72,14 @@ public class AlertController {
             @PathVariable UUID alertId,
             @Valid @RequestBody UpdateAlertStatusRequest request
     ) {
+        return updateAlert(alertId, request);
+    }
+
+    @PatchMapping("/{alertId}")
+    public AlertResponse updateAlert(
+            @PathVariable UUID alertId,
+            @Valid @RequestBody UpdateAlertStatusRequest request
+    ) {
         return alertStatusUpdateService.updateStatus(
                 alertId,
                 request.status(),

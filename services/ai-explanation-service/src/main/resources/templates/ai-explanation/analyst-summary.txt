@@ -1,0 +1,1 @@
+Transaction ${transactionReference} received a ${riskLevel} risk classification with score ${riskScore}. Decision status: ${decisionStatus}.

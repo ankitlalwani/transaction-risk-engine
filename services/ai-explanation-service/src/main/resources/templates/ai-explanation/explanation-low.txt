@@ -1,0 +1,1 @@
+This transaction was classified as ${riskLevel} risk with a score of ${riskScore}. ${decisionReason} The evaluation found that ${ruleSummary}.

@@ -1,0 +1,1 @@
+This transaction was classified as ${riskLevel} risk with a score of ${riskScore}. The decision was based on these risk indicators: ${ruleSummary}. Decision rationale: ${decisionReason}

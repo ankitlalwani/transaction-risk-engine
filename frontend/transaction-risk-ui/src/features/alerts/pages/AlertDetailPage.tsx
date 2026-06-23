@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -61,6 +61,8 @@ function parseTriggeredRules(value: string): AlertTriggeredRule[] {
 export function AlertDetailPage() {
   const { alertId } = useParams();
   const queryClient = useQueryClient();
+  const [isAiExplanationTimedOut, setIsAiExplanationTimedOut] =
+    useState(false);
   const { data, isLoading, isError } = useQuery({
     queryKey: ["alert", alertId],
     queryFn: () => getAlertById(alertId!),
@@ -70,7 +72,35 @@ export function AlertDetailPage() {
     queryKey: ["ai-explanation", data?.transactionId],
     queryFn: () => getAiExplanationByTransactionId(data!.transactionId),
     enabled: Boolean(data?.transactionId),
+    refetchInterval: (query) => {
+      if (query.state.data) return false;
+      if (isAiExplanationTimedOut) return false;
+
+      return 3_000;
+    },
   });
+
+  useEffect(() => {
+    if (!data?.transactionId || aiExplanationQuery.data) {
+      setIsAiExplanationTimedOut(false);
+      return;
+    }
+
+    setIsAiExplanationTimedOut(false);
+    const timeoutId = window.setTimeout(
+      () => setIsAiExplanationTimedOut(true),
+      60_000
+    );
+
+    return () => window.clearTimeout(timeoutId);
+  }, [data?.transactionId, aiExplanationQuery.data]);
+
+  const isAiExplanationGenerating =
+    aiExplanationQuery.data === null &&
+    !isAiExplanationTimedOut;
+  const isAiExplanationUnavailable =
+    aiExplanationQuery.data === null &&
+    isAiExplanationTimedOut;
 
   if (!alertId) return <p>Alert ID is missing.</p>;
   if (isLoading) return <p>Loading alert information...</p>;
@@ -178,6 +208,8 @@ export function AlertDetailPage() {
           explanation={aiExplanationQuery.data}
           isLoading={aiExplanationQuery.isLoading}
           isError={aiExplanationQuery.isError}
+          isGenerating={isAiExplanationGenerating}
+          isUnavailable={isAiExplanationUnavailable}
           errorMessage={
             aiExplanationQuery.error
               ? getAiExplanationErrorMessage(aiExplanationQuery.error)
@@ -245,6 +277,8 @@ type AiExplanationCardProps = {
   explanation?: AiExplanation | null;
   isLoading: boolean;
   isError: boolean;
+  isGenerating: boolean;
+  isUnavailable: boolean;
   errorMessage?: string;
 };
 
@@ -252,6 +286,8 @@ function AiExplanationCard({
   explanation,
   isLoading,
   isError,
+  isGenerating,
+  isUnavailable,
   errorMessage,
 }: AiExplanationCardProps) {
   if (isLoading) {
@@ -272,10 +308,24 @@ function AiExplanationCard({
     );
   }
 
-  if (!explanation) {
+  if (isGenerating) {
     return (
       <Card title="AI Explanation">
-        <p>No AI explanation is available for this transaction yet.</p>
+        <p>
+          AI explanation is being generated through AI. This card will refresh
+          automatically when it is ready.
+        </p>
+      </Card>
+    );
+  }
+
+  if (isUnavailable || !explanation) {
+    return (
+      <Card title="AI Explanation">
+        <p>
+          No AI explanation is available. The generation request did not
+          complete within the expected time.
+        </p>
       </Card>
     );
   }

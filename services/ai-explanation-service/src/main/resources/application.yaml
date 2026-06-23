@@ -45,6 +45,15 @@ management:
       exposure:
         include: health,info,metrics
 
+ai:
+  explanation:
+    mode: ${AI_EXPLANATION_MODE:RULE_BASED}
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      model: ${OPENAI_MODEL:gpt-5-mini}
+      prompt-version: llm-prompt-v1
+
 ai-explanation-service:
   kafka:
     topics:
